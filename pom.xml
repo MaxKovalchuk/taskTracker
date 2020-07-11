@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.busfor</groupId>
+  <artifactId>taskTracker</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>task-tracker</name>
+  <description>Task Tracker</description>
+
+  <properties>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+
+    <encoding>UTF-8</encoding>
+    <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+
+    <!-- dependencies' versions -->
+    <swagger-core.version>2.1.2</swagger-core.version>
+    <springfox-swagger.version>2.9.2</springfox-swagger.version>
+    <internal-test-utils.version>1.0-SNAPSHOT</internal-test-utils.version>
+    <!-- plugins' versions -->
+    <swagger-codegen-maven-plugin.version>3.0.20</swagger-codegen-maven-plugin.version>
+
+    <skip.surefire.tests>${skipTests}</skip.surefire.tests>
+  </properties>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.3.1.RELEASE</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>${springfox-swagger.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>${springfox-swagger.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <version>${swagger-core.version}</version>
+    </dependency>
+
+    <!-- test scope -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- don't include junit 4 -->
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- junit 5 -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>io.swagger.codegen.v3</groupId>
+        <artifactId>swagger-codegen-maven-plugin</artifactId>
+        <version>${swagger-codegen-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/swagger.yaml</inputSpec>
+              <language>spring</language>
+              <output>.</output>
+              <invokerPackage>${project.groupId}</invokerPackage>
+              <apiPackage>${project.groupId}.api</apiPackage>
+              <modelPackage>${project.groupId}.model</modelPackage>
+              <configOptions>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>${project.artifactId}</artifactId>
+                <artifactVersion>${project.version}</artifactVersion>
+                <dateLibrary>java8</dateLibrary>
+                <delegatePattern>true</delegatePattern>
+                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                <java8>true</java8>
+                <library>spring-boot</library>
+                <swaggerDocketConfig>true</swaggerDocketConfig>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>${skip.surefire.tests}</skipTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <parallel>all</parallel>
+          <forkCount>4</forkCount>
+          <reuseForks>true</reuseForks>
+          <useUnlimitedThreads>true</useUnlimitedThreads>
+          <runOrder>random</runOrder>
+          <rerunFailingTestsCount>3</rerunFailingTestsCount>
+          <skipAfterFailureCount>15</skipAfterFailureCount>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

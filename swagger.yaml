@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  title: Task tracker
+  description: Task tracker
+  version: 1.0.0
+
+tags:
+  - name: infrastructure
+    description: Infrastructure services
+
+paths:
+  /v1/ping:
+    get:
+      tags:
+        - infrastructure
+      summary: Check the service availability
+      description: >
+        Check the service availability
+      operationId: v1PingGet
+      parameters: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ping'
+        503:
+          description: The service is not available
+
+components:
+  schemas:
+    Ping:
+      type: object
+      properties:
+        localtime:
+          type: integer
+          format: int64
+          description: Time in ms
+          example: 1528122930772
