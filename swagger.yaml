@@ -27,7 +27,119 @@ paths:
                 $ref: '#/components/schemas/Ping'
         503:
           description: The service is not available
-
+          
+  /v1/tasks:
+    get:
+      operationId: v1TasksGet
+      parameters: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tasks'
+                
+  /v1/department:
+    put:
+      description: add new department
+      consumes:
+        - application/json
+      requestBody:
+        description: department name
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentPutRequest'
+      responses:
+        200:
+          description: OK
+        400:
+          description: name parameter empty
+        500:
+          description: internal server error
+          
+  /v1/user:
+    put:
+      description: add new user
+      consumes:
+        - application/json
+      requestBody:
+        description: user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPutRequest'
+      responses:
+        200:
+          description: OK
+        400:
+          description: parameter empty
+        500:
+          description: internal server error
+          
+  /v1/task:
+    put:
+      description: create task
+      consumes:
+        - application/json
+      requestBody:
+        description: task
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskPutRequest'
+      responses:
+        200:
+          description: OK
+        400:
+          description: parameter empty
+        500:
+          description: internal server error
+          
+  /v1/comment:
+    put:
+      description: add comment
+      consumes:
+        - application/json
+      requestBody:
+        description: add comment to task
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPutRequest'
+      responses:
+        200:
+          description: OK
+        400:
+          description: parameter empty
+        500:
+          description: internal server error
+          
+  /v1/attachment:
+    put:
+      description: add attachment to task
+      consumes:
+        - application/json
+      requestBody:
+        description: add attachment to task
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachmentPutRequest'
+      responses:
+        200:
+          description: OK
+        400:
+          description: parameter empty
+        500:
+          description: internal server error                                          
+      
 components:
   schemas:
     Ping:
@@ -38,3 +150,144 @@ components:
           format: int64
           description: Time in ms
           example: 1528122930772
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        departmentId:
+          type: integer
+        
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: integer
+        authorId:
+          type: integer
+        taskId:
+          type: integer
+        awsLink:
+          type: string
+        
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        taskId:
+          type: integer
+        authorId:
+          type: integer
+        createdAt:
+          type: string
+          format: date
+        isEdited:
+          type: boolean
+        
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        
+    Task:
+      description: task model
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        userCreatedId:
+          type: integer
+        userPerformerId:
+          type: integer
+        status:
+          type: integer
+        estimate:
+          type: integer
+        
+    Tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/Task'
+        
+    Name:
+      description: name string value
+      type: string       
+                   
+    DepartmentPutRequest:
+      description: model for /v1/department PUT request
+      type: object 
+      properties:
+        name:
+          name: name
+          type: string
+          required: true
+          
+    UserPutRequest:
+      description: model for /v1/user PUT request
+      type: object 
+      properties:
+        name:
+          name: name
+          type: string
+          required: true
+        departmentId:
+          name: departmentId
+          type: integer
+          required: true
+          
+    TaskPutRequest:
+      description: model for /v1/task PUT request
+      type: object
+      properties:
+        title:
+          type: string
+          required: true
+        description:
+          type: string
+        userCreatedId:
+          type: integer
+          required: true
+        estimate:
+          type: integer
+          
+    CommentPutRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          required: true
+        taskId:
+          type: integer
+          required: true
+        authorId:
+          type: integer
+          required: true                                              
+          
+    AttachmentPutRequest:
+      type: object
+      properties:
+        authorId:
+          type: integer
+          required: true
+        taskId:
+          type: integer
+          required: true
+        file:
+          type: file
+          required: true                    
