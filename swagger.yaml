@@ -77,6 +77,8 @@ paths:
           description: OK
         400:
           description: parameter empty
+        404:
+          description: department dosent exist
         500:
           description: internal server error
           
@@ -97,6 +99,8 @@ paths:
           description: OK
         400:
           description: parameter empty
+        404:
+          description: user dosent exist
         500:
           description: internal server error
           
@@ -117,6 +121,8 @@ paths:
           description: OK
         400:
           description: parameter empty
+        404:
+          description: task or user dosent exist
         500:
           description: internal server error
           
@@ -137,6 +143,8 @@ paths:
           description: OK
         400:
           description: parameter empty
+        404:
+          description: task or user dosent exist
         500:
           description: internal server error                                          
       

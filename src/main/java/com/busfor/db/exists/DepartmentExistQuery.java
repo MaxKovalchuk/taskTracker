@@ -8,29 +8,11 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DepartmentExistQuery implements ExistQuery{
+public class DepartmentExistQuery extends ExistQueryImpl{
 	
-	private final Logger log = LoggerFactory.getLogger(DepartmentExistQuery.class);
-	private final String SQL = "SELECT * FROM department_by_id(?)";
-	private Connection connection;
-	private Integer departmentId;
+	private static final String DEPARTMENT_EXISTS_FUNCTION = "department_by_id";
 	
 	public DepartmentExistQuery(Connection connection, Integer departmentId) {
-		this.connection = connection;
-		this.departmentId = departmentId;
+		super(connection, departmentId, DEPARTMENT_EXISTS_FUNCTION);
 	}
-
-	@Override
-	public boolean exists() {
-		boolean exist = false;
-		try(PreparedStatement pst = connection.prepareStatement(SQL)){
-			pst.setInt(1, departmentId);
-			ResultSet rs = pst.executeQuery();
-			
-		}catch (SQLException e) {
-			log.error(this.getClass().toString(), e);
-		}
-		return exist;
-	}
-
 }

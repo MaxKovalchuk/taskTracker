@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.busfor.db.DBConnection;
 import com.busfor.db.exists.DepartmentExistQuery;
+import com.busfor.db.exists.TaskExistQuery;
+import com.busfor.db.exists.UserExistQuery;
 import com.busfor.db.insert.CommentQueryInsert;
 import com.busfor.db.insert.DepartmentQueryInsert;
 import com.busfor.db.insert.TaskQueryInsert;
@@ -63,9 +65,9 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 	@Override
 	public ResponseEntity<Void> v1UserPut(UserPutRequest body) {
 		ResponseEntity<Void> response = null;
-		if (isValidUserPutRequest(body)) {
+		if (!isValidUserPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-		} else if(! new DepartmentExistQuery(dbConnection.connection(), body.getDepartmentId()).exists()) {
+		} else if (!new DepartmentExistQuery(dbConnection.connection(), body.getDepartmentId()).exists()) {
 			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
 			UserQueryInsert insertQuery = new UserQueryInsert(body.getName(), body.getDepartmentId(),
@@ -89,6 +91,8 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		ResponseEntity<Void> response = null;
 		if (!isValidTaskPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else if (!new UserExistQuery(dbConnection.connection(), body.getUserCreatedId()).exists()) {
+			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
 			TaskQueryInsert insertQuery = new TaskQueryInsert(body.getTitle(), body.getDescription(),
 					body.getUserCreatedId(), body.getEstimate(), dbConnection.connection());
@@ -111,6 +115,9 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		ResponseEntity<Void> response = null;
 		if (!isValidCommentPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else if (!new UserExistQuery(dbConnection.connection(), body.getAuthorId()).exists()
+				|| !new TaskExistQuery(dbConnection.connection(), body.getTaskId()).exists()) {
+			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
 			CommentQueryInsert insertQuery = new CommentQueryInsert(body.getText(), body.getAuthorId(),
 					body.getTaskId(), dbConnection.connection());
@@ -128,12 +135,12 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		return body.getText() != null && !body.getText().isEmpty() && body.getAuthorId() != null
 				&& body.getTaskId() != null;
 	}
-	
+
 	@Override
 	public ResponseEntity<Void> v1AttachmentPut(AttachmentPutRequest body) {
-		//validate body
-		//save file to s3 and create access link
-		//save link and other data to database
+		// validate body
+		// save file to s3 and create access link
+		// save link and other data to database
 		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
 	}
 }
