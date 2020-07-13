@@ -1,6 +1,8 @@
 package com.busfor.api;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,10 +17,12 @@ import com.busfor.db.insert.CommentQueryInsert;
 import com.busfor.db.insert.DepartmentQueryInsert;
 import com.busfor.db.insert.TaskQueryInsert;
 import com.busfor.db.insert.UserQueryInsert;
+import com.busfor.db.select.AllTasksQuerySelect;
 import com.busfor.model.AttachmentPutRequest;
 import com.busfor.model.CommentPutRequest;
 import com.busfor.model.DepartmentPutRequest;
 import com.busfor.model.Ping;
+import com.busfor.model.TaskGetResponse;
 import com.busfor.model.TaskPutRequest;
 import com.busfor.model.UserPutRequest;
 
@@ -143,4 +147,15 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		// save link and other data to database
 		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
 	}
+
+	//TO DO: Integer if null -> cast to int
+	@Override
+	public ResponseEntity<List<TaskGetResponse>> v1TasksGet(Integer page, Integer pageLimit, Integer departmentId,
+			Boolean sortByDateCreated) {
+		AllTasksQuerySelect query = new AllTasksQuerySelect(page, pageLimit, departmentId, sortByDateCreated,
+				dbConnection.connection());
+		List<TaskGetResponse> tasks = query.select();
+		return new ResponseEntity<List<TaskGetResponse>>(tasks, HttpStatus.OK);
+	}
+
 }

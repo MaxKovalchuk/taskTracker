@@ -27,18 +27,6 @@ paths:
                 $ref: '#/components/schemas/Ping'
         503:
           description: The service is not available
-          
-  /v1/tasks:
-    get:
-      operationId: v1TasksGet
-      parameters: []
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tasks'
                 
   /v1/department:
     put:
@@ -146,7 +134,44 @@ paths:
         404:
           description: task or user dosent exist
         500:
-          description: internal server error                                          
+          description: internal server error
+          
+  /v1/tasks:
+    get:
+      description: get all tasks, paginated if parameters aint empty
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: int
+          required: false
+        - in: query  
+          name: pageLimit
+          schema:
+            type: int
+          required: false
+        - in: query
+          name: departmentId
+          schema:
+            type: int
+          required: false
+        - in: query
+          name: sortByDateCreated
+          schema:
+            type: boolean
+          required: false
+          description: if false then sorting by task id 
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskGetResponse'
+        500:
+          description: internal server error                                                    
       
 components:
   schemas:
@@ -228,11 +253,6 @@ components:
         estimate:
           type: integer
         
-    Tasks:
-      type: array
-      items:
-        $ref: '#/components/schemas/Task'
-        
     Name:
       description: name string value
       type: string       
@@ -298,4 +318,52 @@ components:
           required: true
         file:
           type: file
-          required: true                    
+          required: true        
+
+    TaskGetRequest:
+      description: request to get all tasks
+      type: object
+      properties:
+        page:
+          type: integer
+          description: page number
+        pageLimit:
+          type: integer
+          description: number of tasks at single page
+          
+    TaskGetResponse:
+      description: task model
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        userCreated:
+          $ref: '#/components/schemas/UserWithDepartment'
+        userPerformer:
+          $ref: '#/components/schemas/UserWithDepartment'
+        status:
+          type: integer
+        estimate:
+          type: integer
+          
+    UserWithDepartment:
+      description: response model of user with full department info
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        departmentId:
+          type: integer
+        departmentName:
+          type: string
+        
+                                                
