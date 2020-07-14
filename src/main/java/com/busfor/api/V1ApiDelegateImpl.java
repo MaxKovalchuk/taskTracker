@@ -17,7 +17,9 @@ import com.busfor.db.insert.DepartmentQueryInsert;
 import com.busfor.db.insert.TaskQueryInsert;
 import com.busfor.db.insert.UserQueryInsert;
 import com.busfor.db.select.AllTasksQuerySelect;
+import com.busfor.db.select.CommentsByTaskIdQuerySelect;
 import com.busfor.model.AttachmentPutRequest;
+import com.busfor.model.Comment;
 import com.busfor.model.CommentPutRequest;
 import com.busfor.model.DepartmentPutRequest;
 import com.busfor.model.Ping;
@@ -165,4 +167,23 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		return new ResponseEntity<List<TaskGetResponse>>(tasks.page(), HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<List<Comment>> v1TaskIdCommentsGet(Integer id, Integer page, Integer pageLimit) {
+		ResponseEntity<List<Comment>> response = null;
+		if (id == null || id <= 0) {
+			response = new ResponseEntity<List<Comment>>(HttpStatus.BAD_REQUEST);
+		} else {
+			int pageInt = page == null ? 0 : page;
+			int pageLimitInt = pageLimit == null ? 0 : pageLimit;
+			CommentsByTaskIdQuerySelect query = new CommentsByTaskIdQuerySelect(id, dbConnection.connection());
+			List<Comment> comments = query.select();
+			if(comments.isEmpty()) {
+				response = new ResponseEntity<List<Comment>>(HttpStatus.NOT_FOUND);
+			}else {
+				Pagination<Comment> pagination = new Pagination<Comment>(comments, pageInt, pageLimitInt);
+				response = new ResponseEntity<List<Comment>>(pagination.page(), HttpStatus.OK);
+			}
+		}
+		return response;
+	}
 }
