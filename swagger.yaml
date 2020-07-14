@@ -244,7 +244,33 @@ paths:
         404:
           description: task with given id not found
         500: 
-          description: interal server error                
+          description: interal server error      
+          
+  /v1/task/{id}/assign:
+    post:
+      description: assign task
+      parameters:
+        - in: path
+          name: id   
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: userId
+          schema:
+            type: int
+          required: true
+          description: user performer id
+      responses:
+        200:
+          description: OK
+        400:
+          description: task id is empty                  
+        404:
+          description: task with given id not found
+        500: 
+          description: interal server error                    
                   
 components:
   schemas:

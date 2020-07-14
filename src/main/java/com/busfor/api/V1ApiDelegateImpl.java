@@ -19,6 +19,7 @@ import com.busfor.db.insert.UserQueryInsert;
 import com.busfor.db.select.AllTasksQuerySelect;
 import com.busfor.db.select.AttachmentsByTaskIdQuerySelect;
 import com.busfor.db.select.CommentsByTaskIdQuerySelect;
+import com.busfor.db.update.TaskAssignQueryUpdate;
 import com.busfor.model.Attachment;
 import com.busfor.model.AttachmentPutRequest;
 import com.busfor.model.Comment;
@@ -204,6 +205,22 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 			} else {
 				Pagination<Attachment> pagination = new Pagination<Attachment>(comments, pageInt, pageLimitInt);
 				response = new ResponseEntity<List<Attachment>>(pagination.page(), HttpStatus.OK);
+			}
+		}
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<Void> v1TaskIdAssignPost(Integer id, Integer userId) {
+		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		if (id == null || id <= 0 || userId == null || userId <= 0) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			if (new UserExistQuery(dbConnection.connection(), userId).exists()) {
+				TaskAssignQueryUpdate query = new TaskAssignQueryUpdate(userId, id, dbConnection.connection());
+				if (query.update()) {
+					response = new ResponseEntity<Void>(HttpStatus.OK);
+				}
 			}
 		}
 		return response;
