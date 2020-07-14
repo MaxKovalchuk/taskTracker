@@ -481,7 +481,7 @@ components:
         userPerformer:
           $ref: '#/components/schemas/UserWithDepartment'
         status:
-          type: integer
+          type: string
         estimate:
           type: integer
           

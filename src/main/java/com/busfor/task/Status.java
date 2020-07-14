@@ -20,7 +20,7 @@ public enum Status {
 		this.name = name;
 	}
 	
-	public Status status(int code) {
+	public static Status status(int code) {
 		Status status = null;
 		for(Status s : values()) {
 			if(s.getCode() == code) {
