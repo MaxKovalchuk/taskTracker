@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +39,12 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 	private static final String ESTIMATE = "estimate";
 
 	private final Logger log = LoggerFactory.getLogger(AllTasksQuerySelect.class);
-	private final int page;
-	private final int pageLimit;
 	private final int departmentId;
 	private final boolean sortByDateCreated;
 	private final Connection connection;
 
-	public AllTasksQuerySelect(int page, int pageLimit, int departmentId, boolean sortByDateCreated,
+	public AllTasksQuerySelect(int departmentId, boolean sortByDateCreated,
 			Connection connection) {
-		this.page = page;
-		this.pageLimit = pageLimit;
 		this.departmentId = departmentId;
 		this.sortByDateCreated = sortByDateCreated;
 		this.connection = connection;
@@ -72,7 +69,7 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 		task.setId(rs.getInt(ID));
 		task.setTitle(rs.getString(TITLE));
 		task.setDescription(rs.getString(DESCRIPTION));
-		task.setCreatedAt(LocalDate.parse(rs.getString(CREATED_AT)));
+		task.setCreatedAt(rs.getString(CREATED_AT));
 		task.setUserCreated(userFromResultSet(rs, USER_CREATED_ID, USER_CREATED_NAME, DEPARTMENT_CREATED_ID,
 				DEPARTMENT_CREATED_NAME));
 		task.setUserPerformer(userFromResultSet(rs, USER_PERFORMER_ID, USER_PERFORMER_NAME, DEPARTMENT_PERFORMED_ID,
@@ -94,44 +91,24 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 
 	private String query() {
 		String query = "SELECT * FROM all_tasks a";
-		boolean where = false;
-		pagination(query, where);
-		byDepartmentId(query, where);
-		sortByDate(query);
+		query = byDepartmentId(query);
+		query = sortByDate(query);
 		return query;
 	}
-	
-	private void pagination(String query, boolean where) {
-		if (page > 0 && pageLimit > 0) {
-			query += " WHERE a.id >= " + firstIndex() + " AND a.id <= " + lastIndex();
-			where = true;
-		}
-	}
-	
-	private void byDepartmentId(String query, boolean where) {
+
+	private String byDepartmentId(String query) {
+		String finalQuery = query;
 		if (departmentId > 0) {
-			if(!where) {
-				query += " WHERE ";
-				where = true;
-			}else {
-				query += " AND ";	
-			}
-			query += "a.department_id = " + departmentId;
-			
+			finalQuery += " WHERE a." + DEPARTMENT_CREATED_ID + " = " + departmentId;
 		}
-	}
-	
-	private void sortByDate(String query) {
-		if(sortByDateCreated) {
-			query += " ORDER BY a.created_at";
-		}
+		return finalQuery;
 	}
 
-	private int firstIndex() {
-		return 1 + page * (pageLimit - 1);
-	}
-
-	private int lastIndex() {
-		return firstIndex() + pageLimit - 1;
+	private String sortByDate(String query) {
+		String finalQuery = query;
+		if (sortByDateCreated) {
+			finalQuery += " ORDER BY a." + CREATED_AT;
+		}
+		return finalQuery;
 	}
 }

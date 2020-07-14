@@ -25,6 +25,7 @@ import com.busfor.model.Ping;
 import com.busfor.model.TaskGetResponse;
 import com.busfor.model.TaskPutRequest;
 import com.busfor.model.UserPutRequest;
+import com.busfor.pagination.Pagination;
 
 @Component
 public class V1ApiDelegateImpl implements V1ApiDelegate {
@@ -148,14 +149,17 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
-	//TO DO: Integer if null -> cast to int
 	@Override
 	public ResponseEntity<List<TaskGetResponse>> v1TasksGet(Integer page, Integer pageLimit, Integer departmentId,
 			Boolean sortByDateCreated) {
-		AllTasksQuerySelect query = new AllTasksQuerySelect(page, pageLimit, departmentId, sortByDateCreated,
+		int pageInt = page == null ? 0 : page;
+		int pageLimitInt = pageLimit == null ? 0 : pageLimit;
+		int departmentIdInt = departmentId == null ? 0 : departmentId;
+		boolean sortByDateCreatedBool = sortByDateCreated == null ? false : sortByDateCreated;
+		AllTasksQuerySelect query = new AllTasksQuerySelect(departmentIdInt, sortByDateCreatedBool,
 				dbConnection.connection());
-		List<TaskGetResponse> tasks = query.select();
-		return new ResponseEntity<List<TaskGetResponse>>(tasks, HttpStatus.OK);
+		Pagination<TaskGetResponse> tasks = new Pagination<TaskGetResponse>(query.select(), pageInt, pageLimitInt);
+		return new ResponseEntity<List<TaskGetResponse>>(tasks.page(), HttpStatus.OK);
 	}
 
 }
