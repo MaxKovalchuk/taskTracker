@@ -20,6 +20,7 @@ import com.busfor.db.select.AllTasksQuerySelect;
 import com.busfor.db.select.AttachmentsByTaskIdQuerySelect;
 import com.busfor.db.select.CommentsByTaskIdQuerySelect;
 import com.busfor.db.update.TaskAssignQueryUpdate;
+import com.busfor.db.update.TaskStatusQueryUpdate;
 import com.busfor.model.Attachment;
 import com.busfor.model.AttachmentPutRequest;
 import com.busfor.model.Comment;
@@ -30,6 +31,7 @@ import com.busfor.model.TaskGetResponse;
 import com.busfor.model.TaskPutRequest;
 import com.busfor.model.UserPutRequest;
 import com.busfor.pagination.Pagination;
+import com.busfor.task.Status;
 
 import rating.service.RatingService;
 
@@ -221,6 +223,20 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 				if (query.update()) {
 					response = new ResponseEntity<Void>(HttpStatus.OK);
 				}
+			}
+		}
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<Void> v1TaskIdStatusPost(Integer id, Integer statusId) {
+		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		if (id == null || id <= 0 || statusId == null || statusId < 0 || statusId > Status.values().length) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			TaskStatusQueryUpdate query = new TaskStatusQueryUpdate(statusId, id, dbConnection.connection());
+			if (query.update()) {
+				response = new ResponseEntity<Void>(HttpStatus.OK);
 			}
 		}
 		return response;
