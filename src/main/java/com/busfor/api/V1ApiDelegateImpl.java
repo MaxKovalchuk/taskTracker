@@ -17,7 +17,9 @@ import com.busfor.db.insert.DepartmentQueryInsert;
 import com.busfor.db.insert.TaskQueryInsert;
 import com.busfor.db.insert.UserQueryInsert;
 import com.busfor.db.select.AllTasksQuerySelect;
+import com.busfor.db.select.AttachmentsByTaskIdQuerySelect;
 import com.busfor.db.select.CommentsByTaskIdQuerySelect;
+import com.busfor.model.Attachment;
 import com.busfor.model.AttachmentPutRequest;
 import com.busfor.model.Comment;
 import com.busfor.model.CommentPutRequest;
@@ -177,11 +179,31 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 			int pageLimitInt = pageLimit == null ? 0 : pageLimit;
 			CommentsByTaskIdQuerySelect query = new CommentsByTaskIdQuerySelect(id, dbConnection.connection());
 			List<Comment> comments = query.select();
-			if(comments.isEmpty()) {
+			if (comments.isEmpty()) {
 				response = new ResponseEntity<List<Comment>>(HttpStatus.NOT_FOUND);
-			}else {
+			} else {
 				Pagination<Comment> pagination = new Pagination<Comment>(comments, pageInt, pageLimitInt);
 				response = new ResponseEntity<List<Comment>>(pagination.page(), HttpStatus.OK);
+			}
+		}
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<List<Attachment>> v1TaskIdAttachmentsGet(Integer id, Integer page, Integer pageLimit) {
+		ResponseEntity<List<Attachment>> response = null;
+		if (id == null || id <= 0) {
+			response = new ResponseEntity<List<Attachment>>(HttpStatus.BAD_REQUEST);
+		} else {
+			int pageInt = page == null ? 0 : page;
+			int pageLimitInt = pageLimit == null ? 0 : pageLimit;
+			AttachmentsByTaskIdQuerySelect query = new AttachmentsByTaskIdQuerySelect(id, dbConnection.connection());
+			List<Attachment> comments = query.select();
+			if (comments.isEmpty()) {
+				response = new ResponseEntity<List<Attachment>>(HttpStatus.NOT_FOUND);
+			} else {
+				Pagination<Attachment> pagination = new Pagination<Attachment>(comments, pageInt, pageLimitInt);
+				response = new ResponseEntity<List<Attachment>>(pagination.page(), HttpStatus.OK);
 			}
 		}
 		return response;

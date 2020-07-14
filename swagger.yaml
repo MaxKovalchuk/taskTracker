@@ -208,7 +208,43 @@ paths:
         404:
           description: task with given id not found
         500: 
-          description: interal server error     
+          description: interal server error
+          
+  /v1/task/{id}/attachments:
+    get:
+      description: get all attachments for task
+      parameters:
+        - in: path
+          name: id   
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: page
+          schema:
+            type: int
+          required: false
+        - in: query  
+          name: pageLimit
+          schema:
+            type: int
+          required: false
+      responses:
+        200:
+          description: OK                                                               
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attachment'
+        400:
+          description: task id is empty                  
+        404:
+          description: task with given id not found
+        500: 
+          description: interal server error                
                   
 components:
   schemas:
