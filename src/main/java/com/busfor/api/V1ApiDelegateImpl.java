@@ -1,6 +1,5 @@
 package com.busfor.api;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,17 +26,21 @@ import com.busfor.model.TaskPutRequest;
 import com.busfor.model.UserPutRequest;
 import com.busfor.pagination.Pagination;
 
+import rating.service.RatingService;
+
 @Component
 public class V1ApiDelegateImpl implements V1ApiDelegate {
 
 	DBConnection dbConnection;
+	RatingService ratingService;
 
 	public V1ApiDelegateImpl() {
 	}
 
 	@Autowired
-	public V1ApiDelegateImpl(DBConnection dbConnection) {
+	public V1ApiDelegateImpl(DBConnection dbConnection, RatingService ratingService) {
 		this.dbConnection = dbConnection;
+		this.ratingService = ratingService;
 	}
 
 	@Override
@@ -157,7 +160,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		int departmentIdInt = departmentId == null ? 0 : departmentId;
 		boolean sortByDateCreatedBool = sortByDateCreated == null ? false : sortByDateCreated;
 		AllTasksQuerySelect query = new AllTasksQuerySelect(departmentIdInt, sortByDateCreatedBool,
-				dbConnection.connection());
+				dbConnection.connection(), ratingService);
 		Pagination<TaskGetResponse> tasks = new Pagination<TaskGetResponse>(query.select(), pageInt, pageLimitInt);
 		return new ResponseEntity<List<TaskGetResponse>>(tasks.page(), HttpStatus.OK);
 	}

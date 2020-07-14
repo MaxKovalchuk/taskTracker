@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import com.busfor.model.TaskGetResponse;
 import com.busfor.model.UserWithDepartment;
 
+import rating.service.RatingService;
+
 /*TO DO: refactor:
  * extend from swagger models to make model which forms from ResultSet
  * make SQL query as component
@@ -42,12 +44,14 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 	private final int departmentId;
 	private final boolean sortByDateCreated;
 	private final Connection connection;
+	private final RatingService ratingService;
 
 	public AllTasksQuerySelect(int departmentId, boolean sortByDateCreated,
-			Connection connection) {
+			Connection connection, RatingService ratingService) {
 		this.departmentId = departmentId;
 		this.sortByDateCreated = sortByDateCreated;
 		this.connection = connection;
+		this.ratingService = ratingService;
 	}
 
 	@Override
@@ -86,6 +90,7 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 		user.setName(rs.getString(userName));
 		user.setDepartmentId(rs.getInt(departmentId));
 		user.setDepartmentName(rs.getString(departmentName));
+		user.setRating(ratingService.userRating(user.getId()));
 		return user;
 	}
 

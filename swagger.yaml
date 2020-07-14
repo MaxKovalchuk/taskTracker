@@ -361,6 +361,8 @@ components:
           type: integer
         name:
           type: string
+        rating:
+          type: integer
         departmentId:
           type: integer
         departmentName:

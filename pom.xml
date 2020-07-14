@@ -25,6 +25,8 @@
     <swagger-core.version>2.1.2</swagger-core.version>
     <springfox-swagger.version>2.9.2</springfox-swagger.version>
     <internal-test-utils.version>1.0-SNAPSHOT</internal-test-utils.version>
+    <apache.http.client.version>4.5.6</apache.http.client.version>
+    <postgresql.driver.version>42.2.12</postgresql.driver.version>
     <!-- plugins' versions -->
     <swagger-codegen-maven-plugin.version>3.0.20</swagger-codegen-maven-plugin.version>
 
@@ -102,18 +104,17 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>2.23.4</version>
-      <scope>test</scope>
-    </dependency>
 	<dependency>
 	    <groupId>org.postgresql</groupId>
 	    <artifactId>postgresql</artifactId>
-	    <version>42.2.12</version>
+	    <version>${postgresql.driver.version}</version>
 	</dependency>
-    
+	
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
+	    <version>${apache.http.client.version}</version>
+	</dependency>
   </dependencies>
 
   <build>
