@@ -165,7 +165,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		int pageInt = page == null ? 0 : page;
 		int pageLimitInt = pageLimit == null ? 0 : pageLimit;
 		int departmentIdInt = departmentId == null ? 0 : departmentId;
-		boolean sortByDateCreatedBool = sortByDateCreated == null ? false : sortByDateCreated;
+		boolean sortByDateCreatedBool = sortByDateCreated != null && sortByDateCreated;
 		AllTasksQuerySelect query = new AllTasksQuerySelect(departmentIdInt, sortByDateCreatedBool,
 				dbConnection.connection(), ratingService);
 		Pagination<TaskGetResponse> tasks = new Pagination<TaskGetResponse>(query.select(), pageInt, pageLimitInt);

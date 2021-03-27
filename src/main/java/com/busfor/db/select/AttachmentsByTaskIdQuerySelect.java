@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.busfor.model.Attachment;
-import com.busfor.model.extended.ResultSetAttachment;
+import com.busfor.extended.ResultSetAttachment;
 
 public class AttachmentsByTaskIdQuerySelect implements QuerySelect<Attachment> {
 

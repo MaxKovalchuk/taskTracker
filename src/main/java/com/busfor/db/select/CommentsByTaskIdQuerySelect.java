@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.busfor.model.Comment;
-import com.busfor.model.extended.ResultSetComment;
+import com.busfor.extended.ResultSetComment;
 
 public class CommentsByTaskIdQuerySelect implements QuerySelect<Comment> {
 

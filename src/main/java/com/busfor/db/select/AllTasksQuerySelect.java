@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.busfor.model.TaskGetResponse;
-import com.busfor.model.extended.ResultSetTaskGetResponse;
+import com.busfor.extended.ResultSetTaskGetResponse;
 
 import rating.service.RatingService;
 
@@ -42,7 +42,7 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 
 	@Override
 	public List<TaskGetResponse> select() {
-		List<TaskGetResponse> tasks = new ArrayList<TaskGetResponse>();
+		List<TaskGetResponse> tasks = new ArrayList<>();
 		try (Statement st = connection.createStatement()) {
 			ResultSet rs = st.executeQuery(query());
 			while (rs.next()) {

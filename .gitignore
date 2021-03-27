@@ -1,4 +1,5 @@
 src/main/java/com/busfor/model/*
+!src/main/java/com/busfor/extended/*
 src/main/java/com/busfor/api/*
 !src/main/java/com/busfor/api/*Impl.java
 src/main/java/io/swagger/configuration/*

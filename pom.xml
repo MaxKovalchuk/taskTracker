@@ -29,8 +29,6 @@
     <postgresql.driver.version>42.2.12</postgresql.driver.version>
     <!-- plugins' versions -->
     <swagger-codegen-maven-plugin.version>3.0.20</swagger-codegen-maven-plugin.version>
-
-    <skip.surefire.tests>${skipTests}</skip.surefire.tests>
   </properties>
 
   <parent>
