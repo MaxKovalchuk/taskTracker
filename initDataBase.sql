@@ -37,8 +37,9 @@ CREATE TABLE public."comment" (
 CREATE TABLE public.attachment (
 	id serial primary key,
 	author_id int NOT NULL,
-	aws_link varchar(150) NOT NULL,
-	task_id int NOT null,
+	task_id int NOT NULL,
+	file_name varchar(30) not null,
+	bytes bytea not null,
 	foreign key (author_id) references "user" (id),
 	foreign key (task_id) references task (id)
 );
