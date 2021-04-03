@@ -1,5 +1,6 @@
 package com.busfor.db.select;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +36,7 @@ public class AttachmentsByTaskIdQuerySelect implements QuerySelect<Attachment> {
 			while (rs.next()) {
 				attachments.add(new ResultSetAttachment(rs));
 			}
-		} catch (SQLException e) {
+		} catch (SQLException | IOException e) {
 			log.error(this.getClass().toString(), e);
 		}
 		return attachments;

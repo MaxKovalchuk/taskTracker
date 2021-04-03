@@ -3,6 +3,7 @@ package com.busfor.api;
 import java.util.Date;
 import java.util.List;
 
+import com.busfor.db.insert.AttachmentQueryInsert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,7 @@ import com.busfor.model.UserPutRequest;
 import com.busfor.pagination.Pagination;
 import com.busfor.task.Status;
 
+import org.springframework.web.multipart.MultipartFile;
 import rating.service.RatingService;
 
 @Component
@@ -54,6 +56,29 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 	public ResponseEntity<Ping> v1PingGet() {
 		Ping pong = new Ping().localtime(new Date().getTime());
 		return new ResponseEntity<>(pong, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<Void> v1AttachmentPut(Integer authorId, Integer taskId, MultipartFile attachment) {
+		ResponseEntity<Void> response = null;
+		if (!isValidAttachmentPutRequest(authorId, taskId, attachment)) {
+			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} else {
+			AttachmentQueryInsert queryInsert = new AttachmentQueryInsert(authorId, taskId, attachment, dbConnection.connection());
+			boolean inserted = queryInsert.insert();
+			if (inserted) {
+				response = new ResponseEntity<>(HttpStatus.OK);
+			} else {
+				response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		return response;
+	}
+
+	private boolean isValidAttachmentPutRequest(Integer authorId, Integer taskId, MultipartFile attachment) {
+		return authorId != null
+				&& taskId != null
+				&& attachment != null;
 	}
 
 	@Override
@@ -152,14 +177,6 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 	}
 
 	@Override
-	public ResponseEntity<Void> v1AttachmentPut(AttachmentPutRequest body) {
-		// validate body
-		// save file to s3 and create access link
-		// save link and other data to database
-		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-	}
-
-	@Override
 	public ResponseEntity<List<TaskGetResponse>> v1TasksGet(Integer page, Integer pageLimit, Integer departmentId,
 			Boolean sortByDateCreated) {
 		int pageInt = page == null ? 0 : page;
@@ -201,11 +218,11 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 			int pageInt = page == null ? 0 : page;
 			int pageLimitInt = pageLimit == null ? 0 : pageLimit;
 			AttachmentsByTaskIdQuerySelect query = new AttachmentsByTaskIdQuerySelect(id, dbConnection.connection());
-			List<Attachment> comments = query.select();
-			if (comments.isEmpty()) {
+			List<Attachment> attachments = query.select();
+			if (attachments.isEmpty()) {
 				response = new ResponseEntity<List<Attachment>>(HttpStatus.NOT_FOUND);
 			} else {
-				Pagination<Attachment> pagination = new Pagination<Attachment>(comments, pageInt, pageLimitInt);
+				Pagination<Attachment> pagination = new Pagination<Attachment>(attachments, pageInt, pageLimitInt);
 				response = new ResponseEntity<List<Attachment>>(pagination.page(), HttpStatus.OK);
 			}
 		}

@@ -24,22 +24,21 @@ public class AttachmentsByTaskIdQuerySelectTest {
 	PreparedStatement pst;
 	@Mock
 	ResultSet rs;
-	String example = "example";
 	
 	@Test
 	public void selectTest() throws SQLException {
-		Attachment expected = new Attachment().id(1).authorId(1).awsLink(example).taskId(1);
+		Attachment expected = new Attachment().id(1).authorId(1).taskId(1);
 		Mockito.doReturn(pst).when(connection).prepareStatement(Mockito.anyString());
 		Mockito.doReturn(rs).when(pst).executeQuery();
 		Mockito.doReturn(true, false).when(rs).next();
 		Mockito.doReturn(1).when(rs).getInt(Mockito.anyString());
-		Mockito.doReturn(example).when(rs).getString(Mockito.anyString());
+		Mockito.doReturn("testGarbage/fileName.txt").when(rs).getString(Mockito.anyString());
+		Mockito.doReturn(new byte[100]).when(rs).getBytes(Mockito.anyString());
 		AttachmentsByTaskIdQuerySelect spy = new AttachmentsByTaskIdQuerySelect(1, connection);
 		Attachment actual = spy.select().get(0);
 		assertEquals(expected.getId(), actual.getId());
 		assertEquals(expected.getAuthorId(), actual.getAuthorId());
 		assertEquals(expected.getTaskId(), actual.getTaskId());
-		assertEquals(expected.getAwsLink(), actual.getAwsLink());
 	}
 	
 }

@@ -113,7 +113,7 @@ paths:
           description: task or user dosent exist
         500:
           description: internal server error
-          
+
   /v1/attachment:
     put:
       description: add attachment to task
@@ -123,9 +123,19 @@ paths:
         description: add attachment to task
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AttachmentPutRequest'
+              type: object
+              properties:
+                authorId:
+                  type: integer
+                  required: true
+                taskId:
+                  type: integer
+                  required: true
+                attachment:
+                  type: string
+                  format: binary
       responses:
         200:
           description: OK
@@ -337,7 +347,9 @@ components:
           type: integer
         taskId:
           type: integer
-        awsLink:
+        fileName:
+          type: string
+        fileBytes:
           type: string
         
     Comment:
@@ -438,20 +450,7 @@ components:
           required: true
         authorId:
           type: integer
-          required: true                                              
-          
-    AttachmentPutRequest:
-      type: object
-      properties:
-        authorId:
-          type: integer
           required: true
-        taskId:
-          type: integer
-          required: true
-        file:
-          type: file
-          required: true        
 
     TaskGetRequest:
       description: request to get all tasks
