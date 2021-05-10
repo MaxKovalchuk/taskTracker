@@ -33,7 +33,7 @@ public class AttachmentQueryInsert extends Attachment implements QueryInsert {
 		try (PreparedStatement pst = connection.prepareStatement(SQL)){
 			pst.setInt(1, getAuthorId());
 			pst.setInt(2, getTaskId());
-			pst.setString(3, file.getName());
+			pst.setString(3, file.getOriginalFilename());
 			pst.setBytes(4, file.getBytes());
 			int affectedRows = pst.executeUpdate();
 			inserted = affectedRows > 0;
