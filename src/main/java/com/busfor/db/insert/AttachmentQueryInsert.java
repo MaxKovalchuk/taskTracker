@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AttachmentQueryInsert extends Attachment implements QueryInsert {
 
 	private final Logger log = LoggerFactory.getLogger(AttachmentQueryInsert.class);
-	private final String SQL = "INSERT INTO attachment(author_id, task_id, bytes) " + "VALUES(?,?,?)";
+	private final String SQL = "INSERT INTO attachment(author_id, task_id, file_name, bytes) " + "VALUES(?,?,?,?)";
 
 	private final Connection connection;
 	private final MultipartFile file;
@@ -33,7 +33,8 @@ public class AttachmentQueryInsert extends Attachment implements QueryInsert {
 		try (PreparedStatement pst = connection.prepareStatement(SQL)){
 			pst.setInt(1, getAuthorId());
 			pst.setInt(2, getTaskId());
-			pst.setBytes(3, file.getBytes());
+			pst.setString(3, file.getName());
+			pst.setBytes(4, file.getBytes());
 			int affectedRows = pst.executeUpdate();
 			inserted = affectedRows > 0;
 		} catch (SQLException | IOException e) {

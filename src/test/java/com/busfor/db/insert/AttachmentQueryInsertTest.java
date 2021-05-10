@@ -31,6 +31,7 @@ public class AttachmentQueryInsertTest {
 	public void inserTest() throws SQLException, IOException {
 		Mockito.doReturn(pst).when(connection).prepareStatement(Mockito.anyString());
 		Mockito.doReturn(1).when(pst).executeUpdate();
+		Mockito.doReturn("file.png").when(file).getName();
 		Mockito.doReturn(new byte[100]).when(file).getBytes();
 		AttachmentQueryInsert spy = new AttachmentQueryInsert(1, 1, file, connection);
 		assertTrue(spy.insert());
