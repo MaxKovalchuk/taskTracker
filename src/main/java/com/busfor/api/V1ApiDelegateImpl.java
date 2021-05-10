@@ -23,7 +23,6 @@ import com.busfor.db.select.CommentsByTaskIdQuerySelect;
 import com.busfor.db.update.TaskAssignQueryUpdate;
 import com.busfor.db.update.TaskStatusQueryUpdate;
 import com.busfor.model.Attachment;
-import com.busfor.model.AttachmentPutRequest;
 import com.busfor.model.Comment;
 import com.busfor.model.CommentPutRequest;
 import com.busfor.model.DepartmentPutRequest;
