@@ -9,7 +9,7 @@ public enum Status {
 	WAITING_FOR_QA(4, "Waiting for QA"),
 	QA(5, "QA"),
 	DONE(6, "Done"),
-	READY_FOR_RELISE(7, "Ready for relise"),
+	READY_FOR_RELISE(7, "Ready for realise"),
 	REOPENED(8, "Reopened");
 	
 	private int code;
