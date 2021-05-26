@@ -24,7 +24,7 @@ public class AttachmentQueryInsertTest {
 	Connection connection;
 	@Mock
 	PreparedStatement pst;
-	@Mock
+	@Mock(lenient = true)
 	MultipartFile file;
 
 	@Test
