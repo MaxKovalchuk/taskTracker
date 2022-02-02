@@ -26,7 +26,7 @@
     <springfox-swagger.version>2.9.2</springfox-swagger.version>
     <internal-test-utils.version>1.0-SNAPSHOT</internal-test-utils.version>
     <apache.http.client.version>4.5.6</apache.http.client.version>
-    <postgresql.driver.version>42.2.12</postgresql.driver.version>
+    <postgresql.driver.version>42.2.25</postgresql.driver.version>
     <!-- plugins' versions -->
     <swagger-codegen-maven-plugin.version>3.0.20</swagger-codegen-maven-plugin.version>
   </properties>
