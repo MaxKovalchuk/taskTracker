@@ -1,19 +1,16 @@
 package com.busfor.db.select;
 
+import com.busfor.extended.ResultSetTaskGetResponse;
+import com.busfor.model.TaskGetResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.busfor.model.TaskGetResponse;
-import com.busfor.extended.ResultSetTaskGetResponse;
-
-import rating.service.RatingService;
 
 
 public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
@@ -30,14 +27,11 @@ public class AllTasksQuerySelect implements QuerySelect<TaskGetResponse> {
 	private final int departmentId;
 	private final boolean sortByDateCreated;
 	private final Connection connection;
-	private final RatingService ratingService;
 
-	public AllTasksQuerySelect(int departmentId, boolean sortByDateCreated, Connection connection,
-			RatingService ratingService) {
+	public AllTasksQuerySelect(int departmentId, boolean sortByDateCreated, Connection connection) {
 		this.departmentId = departmentId;
 		this.sortByDateCreated = sortByDateCreated;
 		this.connection = connection;
-		this.ratingService = ratingService;
 	}
 
 	@Override

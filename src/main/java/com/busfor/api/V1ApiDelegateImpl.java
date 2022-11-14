@@ -1,54 +1,44 @@
 package com.busfor.api;
 
-import java.util.Date;
-import java.util.List;
-
-import com.busfor.db.insert.AttachmentQueryInsert;
+import com.busfor.controller.*;
+import com.busfor.model.*;
+import com.busfor.pagination.Pagination;
+import com.busfor.task.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import com.busfor.db.DBConnection;
-import com.busfor.db.exists.DepartmentExistQuery;
-import com.busfor.db.exists.TaskExistQuery;
-import com.busfor.db.exists.UserExistQuery;
-import com.busfor.db.insert.CommentQueryInsert;
-import com.busfor.db.insert.DepartmentQueryInsert;
-import com.busfor.db.insert.TaskQueryInsert;
-import com.busfor.db.insert.UserQueryInsert;
-import com.busfor.db.select.AllTasksQuerySelect;
-import com.busfor.db.select.AttachmentsByTaskIdQuerySelect;
-import com.busfor.db.select.CommentsByTaskIdQuerySelect;
-import com.busfor.db.update.TaskAssignQueryUpdate;
-import com.busfor.db.update.TaskStatusQueryUpdate;
-import com.busfor.model.Attachment;
-import com.busfor.model.Comment;
-import com.busfor.model.CommentPutRequest;
-import com.busfor.model.DepartmentPutRequest;
-import com.busfor.model.Ping;
-import com.busfor.model.TaskGetResponse;
-import com.busfor.model.TaskPutRequest;
-import com.busfor.model.UserPutRequest;
-import com.busfor.pagination.Pagination;
-import com.busfor.task.Status;
-
 import org.springframework.web.multipart.MultipartFile;
 import rating.service.RatingService;
+
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class V1ApiDelegateImpl implements V1ApiDelegate {
 
-	DBConnection dbConnection;
-	RatingService ratingService;
-
-	public V1ApiDelegateImpl() {
-	}
+	private final RatingService ratingService;
+	private final AttachmentController attachmentController;
+	private final DepartmentController departmentController;
+	private final UserController userController;
+	private final TaskController taskController;
+	private final CommentController commentController;
 
 	@Autowired
-	public V1ApiDelegateImpl(DBConnection dbConnection, RatingService ratingService) {
-		this.dbConnection = dbConnection;
+	public V1ApiDelegateImpl(
+			RatingService ratingService,
+			AttachmentController attachmentController,
+			DepartmentController departmentController,
+			UserController userController,
+			TaskController taskController,
+			CommentController commentController
+	) {
 		this.ratingService = ratingService;
+		this.attachmentController = attachmentController;
+		this.departmentController = departmentController;
+		this.userController = userController;
+		this.taskController = taskController;
+		this.commentController = commentController;
 	}
 
 	@Override
@@ -63,8 +53,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		if (!isValidAttachmentPutRequest(authorId, taskId, attachment)) {
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} else {
-			AttachmentQueryInsert queryInsert = new AttachmentQueryInsert(authorId, taskId, attachment, dbConnection.connection());
-			boolean inserted = queryInsert.insert();
+			boolean inserted = attachmentController.save(authorId, taskId, attachment);
 			if (inserted) {
 				response = new ResponseEntity<>(HttpStatus.OK);
 			} else {
@@ -86,8 +75,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		if (!isValidDepartmentPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
 		} else {
-			DepartmentQueryInsert insertQuery = new DepartmentQueryInsert(body.getName(), dbConnection.connection());
-			boolean inserted = insertQuery.insert();
+			boolean inserted = departmentController.save(body.getName());
 			if (inserted) {
 				response = new ResponseEntity<Void>(HttpStatus.OK);
 			} else {
@@ -106,12 +94,10 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		ResponseEntity<Void> response = null;
 		if (!isValidUserPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-		} else if (!new DepartmentExistQuery(dbConnection.connection(), body.getDepartmentId()).exists()) {
+		} else if (!departmentController.exists(body.getDepartmentId())) {
 			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
-			UserQueryInsert insertQuery = new UserQueryInsert(body.getName(), body.getDepartmentId(),
-					dbConnection.connection());
-			boolean inserted = insertQuery.insert();
+			boolean inserted = userController.save(body.getName(), body.getDepartmentId());
 			if (inserted) {
 				response = new ResponseEntity<Void>(HttpStatus.OK);
 			} else {
@@ -130,12 +116,13 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		ResponseEntity<Void> response = null;
 		if (!isValidTaskPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-		} else if (!new UserExistQuery(dbConnection.connection(), body.getUserCreatedId()).exists()) {
+        } else if (!userController.exists(body.getUserCreatedId())) {
 			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
-			TaskQueryInsert insertQuery = new TaskQueryInsert(body.getTitle(), body.getDescription(),
-					body.getUserCreatedId(), body.getEstimate(), dbConnection.connection());
-			boolean inserted = insertQuery.insert();
+			boolean inserted = taskController.save(body.getTitle(),
+					body.getDescription(),
+					body.getUserCreatedId(),
+					body.getEstimate());
 			if (inserted) {
 				response = new ResponseEntity<Void>(HttpStatus.OK);
 			} else {
@@ -154,13 +141,12 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		ResponseEntity<Void> response = null;
 		if (!isValidCommentPutRequest(body)) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-		} else if (!new UserExistQuery(dbConnection.connection(), body.getAuthorId()).exists()
-				|| !new TaskExistQuery(dbConnection.connection(), body.getTaskId()).exists()) {
+		} else if (!userController.exists(body.getAuthorId())
+				|| !taskController.exists(body.getTaskId())) {
 			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
-			CommentQueryInsert insertQuery = new CommentQueryInsert(body.getText(), body.getAuthorId(),
-					body.getTaskId(), dbConnection.connection());
-			boolean inserted = insertQuery.insert();
+			boolean inserted = commentController.save(body.getText(), body.getAuthorId(),
+					body.getTaskId());
 			if (inserted) {
 				response = new ResponseEntity<Void>(HttpStatus.OK);
 			} else {
@@ -182,10 +168,9 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		int pageLimitInt = pageLimit == null ? 0 : pageLimit;
 		int departmentIdInt = departmentId == null ? 0 : departmentId;
 		boolean sortByDateCreatedBool = sortByDateCreated != null && sortByDateCreated;
-		AllTasksQuerySelect query = new AllTasksQuerySelect(departmentIdInt, sortByDateCreatedBool,
-				dbConnection.connection(), ratingService);
-		Pagination<TaskGetResponse> tasks = new Pagination<TaskGetResponse>(query.select(), pageInt, pageLimitInt);
-		return new ResponseEntity<List<TaskGetResponse>>(tasks.page(), HttpStatus.OK);
+		List<TaskGetResponse> tasks = taskController.findAll(departmentIdInt, sortByDateCreatedBool);
+		Pagination<TaskGetResponse> paginatedTasks = new Pagination<TaskGetResponse>(tasks, pageInt, pageLimitInt);
+		return new ResponseEntity<List<TaskGetResponse>>(paginatedTasks.page(), HttpStatus.OK);
 	}
 
 	@Override
@@ -196,8 +181,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		} else {
 			int pageInt = page == null ? 0 : page;
 			int pageLimitInt = pageLimit == null ? 0 : pageLimit;
-			CommentsByTaskIdQuerySelect query = new CommentsByTaskIdQuerySelect(id, dbConnection.connection());
-			List<Comment> comments = query.select();
+			List<Comment> comments = commentController.findByTaskId(id);
 			if (comments.isEmpty()) {
 				response = new ResponseEntity<List<Comment>>(HttpStatus.NOT_FOUND);
 			} else {
@@ -216,8 +200,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		} else {
 			int pageInt = page == null ? 0 : page;
 			int pageLimitInt = pageLimit == null ? 0 : pageLimit;
-			AttachmentsByTaskIdQuerySelect query = new AttachmentsByTaskIdQuerySelect(id, dbConnection.connection());
-			List<Attachment> attachments = query.select();
+			List<Attachment> attachments = attachmentController.findByTaskId(id);
 			if (attachments.isEmpty()) {
 				response = new ResponseEntity<List<Attachment>>(HttpStatus.NOT_FOUND);
 			} else {
@@ -234,9 +217,9 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		if (id == null || id <= 0 || userId == null || userId <= 0) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
 		} else {
-			if (new UserExistQuery(dbConnection.connection(), userId).exists()) {
-				TaskAssignQueryUpdate query = new TaskAssignQueryUpdate(userId, id, dbConnection.connection());
-				if (query.update()) {
+			if (userController.exists(userId)) {
+				boolean assigned = taskController.assign(id, userId);
+				if (assigned) {
 					response = new ResponseEntity<Void>(HttpStatus.OK);
 				}
 			}
@@ -250,8 +233,8 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 		if (id == null || id <= 0 || statusId == null || statusId < 0 || statusId > Status.values().length) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
 		} else {
-			TaskStatusQueryUpdate query = new TaskStatusQueryUpdate(statusId, id, dbConnection.connection());
-			if (query.update()) {
+			boolean updated = taskController.updateStatus(id, statusId);
+			if (updated) {
 				response = new ResponseEntity<Void>(HttpStatus.OK);
 			}
 		}
