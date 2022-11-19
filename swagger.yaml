@@ -315,8 +315,28 @@ paths:
         404:
           description: task with given id not found
         500: 
-          description: interal server error                              
-                  
+          description: interal server error
+
+  /v1/estimator/configure:
+    post:
+      description: configure auto estimation
+      consumes:
+        - application/json
+      requestBody:
+        description: text and its complexity
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimatorConfigureRequest'
+      responses:
+        200:
+          description: OK
+        400:
+          description: parameter empty
+        500:
+          description: internal server error
+
 components:
   schemas:
     Ping:
@@ -499,4 +519,11 @@ components:
         departmentName:
           type: string
         
-                                                
+    EstimatorConfigureRequest:
+      description: reuest model for estimator configuration
+      type: object
+      properties:
+        text:
+          type: string
+        complexity:
+          type: integer

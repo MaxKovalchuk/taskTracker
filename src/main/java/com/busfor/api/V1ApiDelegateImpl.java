@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import rating.service.RatingService;
+import services.EstimatorService;
 
 import java.util.Date;
 import java.util.List;
@@ -17,23 +18,23 @@ import java.util.List;
 @Component
 public class V1ApiDelegateImpl implements V1ApiDelegate {
 
-	private final RatingService ratingService;
 	private final AttachmentController attachmentController;
 	private final DepartmentController departmentController;
 	private final UserController userController;
 	private final TaskController taskController;
 	private final CommentController commentController;
+	private final EstimatorService estimatorService;
 
 	@Autowired
 	public V1ApiDelegateImpl(
-			RatingService ratingService,
 			AttachmentController attachmentController,
 			DepartmentController departmentController,
 			UserController userController,
 			TaskController taskController,
-			CommentController commentController
+			CommentController commentController,
+			EstimatorService estimatorService
 	) {
-		this.ratingService = ratingService;
+		this.estimatorService = estimatorService;
 		this.attachmentController = attachmentController;
 		this.departmentController = departmentController;
 		this.userController = userController;
@@ -237,6 +238,19 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 			if (updated) {
 				response = new ResponseEntity<Void>(HttpStatus.OK);
 			}
+		}
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<Void> v1EstimatorConfigurePost(EstimatorConfigureRequest body) {
+		ResponseEntity<Void> response;
+		if (body == null || StringUtils.isEmpty(body.getText())
+				|| body.getComplexity() == null || body.getComplexity() < 0) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			estimatorService.estimate(body.getText(), body.getComplexity());
+			response = new ResponseEntity<Void>(HttpStatus.OK);
 		}
 		return response;
 	}
