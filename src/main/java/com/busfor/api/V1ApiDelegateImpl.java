@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import services.EstimatorService;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -120,6 +121,15 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
         } else if (!userController.exists(body.getUserCreatedId())) {
 			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
+			if(body.isAutoestimate()) {
+				try {
+					int estimate = estimatorService.estimate(body.getTitle(), body.getDescription());
+					body.setEstimate(estimate);
+				} catch (IOException e) {
+					log.error(e.getMessage());
+					response = new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			}
 			boolean inserted = taskController.save(body.getTitle(),
 					body.getDescription(),
 					body.getUserCreatedId(),
@@ -229,6 +239,57 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 	}
 
 	@Override
+	public ResponseEntity<Void> v1TaskIdDescriptionPut(
+			Integer id,
+			String description
+	) {
+		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		if (id == null || id <= 0 || description == null) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			if (taskController.exists(id)) {
+				taskController.updateDescription(id, description);
+				response = new ResponseEntity<Void>(HttpStatus.OK);
+			}
+		}
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<Void> v1TaskIdTitlePut(
+			Integer id,
+			String title
+	) {
+		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		if (id == null || id <= 0 || title == null) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			if (taskController.exists(id)) {
+				taskController.updateTitle(id, title);
+				response = new ResponseEntity<Void>(HttpStatus.OK);
+			}
+		}
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<Void> v1TaskIdEstimatePut(
+			Integer id,
+			Integer estimate
+	) {
+		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		if (id == null || id <= 0 || estimate == null) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			if (taskController.exists(id)) {
+				taskController.updateEstimate(id, estimate);
+				response = new ResponseEntity<Void>(HttpStatus.OK);
+			}
+		}
+		return response;
+	}
+
+	@Override
 	public ResponseEntity<Void> v1TaskIdStatusPost(Integer id, Integer statusId) {
 		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		if (id == null || id <= 0 || statusId == null || statusId < 0 || statusId > Status.values().length) {
@@ -249,7 +310,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 				|| body.getComplexity() == null || body.getComplexity() < 0) {
 			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
 		} else {
-			estimatorService.estimate(body.getText(), body.getComplexity());
+			estimatorService.saveKey(body.getText(), body.getComplexity());
 			response = new ResponseEntity<Void>(HttpStatus.OK);
 		}
 		return response;

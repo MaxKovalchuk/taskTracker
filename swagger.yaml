@@ -317,6 +317,81 @@ paths:
         500: 
           description: interal server error
 
+  /v1/task/{id}/description:
+    put:
+      description: change task description
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: description
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: task id is empty
+        404:
+          description: task with given id not found
+        500:
+          description: interal server error
+
+  /v1/task/{id}/title:
+    put:
+      description: change task title
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: title
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: task id is empty
+        404:
+          description: task with given id not found
+        500:
+          description: interal server error
+
+  /v1/task/{id}/estimate:
+    put:
+      description: change task estimate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: estimate
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: task id is empty
+        404:
+          description: task with given id not found
+        500:
+          description: interal server error
+
   /v1/estimator/configure:
     post:
       description: configure auto estimation
@@ -458,6 +533,8 @@ components:
           required: true
         estimate:
           type: integer
+        autoestimate:
+          type: boolean
           
     CommentPutRequest:
       type: object

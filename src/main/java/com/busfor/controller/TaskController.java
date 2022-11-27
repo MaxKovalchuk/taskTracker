@@ -4,22 +4,29 @@ import com.busfor.db.DBConnection;
 import com.busfor.db.exists.TaskExistQuery;
 import com.busfor.db.insert.TaskQueryInsert;
 import com.busfor.db.select.AllTasksQuerySelect;
-import com.busfor.db.update.TaskAssignQueryUpdate;
-import com.busfor.db.update.TaskStatusQueryUpdate;
+import com.busfor.db.select.TaskQuerySelect;
+import com.busfor.db.update.*;
 import com.busfor.model.TaskGetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import services.EstimatorService;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
 public class TaskController {
 
     private final DBConnection dbConnection;
+    private final EstimatorService estimatorService;
 
     @Autowired
-    public TaskController(DBConnection dbConnection) {
+    public TaskController(
+            DBConnection dbConnection,
+            EstimatorService estimatorService
+    ) {
         this.dbConnection = dbConnection;
+        this.estimatorService = estimatorService;
     }
 
     public boolean save(
@@ -57,5 +64,52 @@ public class TaskController {
             int statusId
     ) {
         return new TaskStatusQueryUpdate(statusId, id, dbConnection.connection()).update();
+    }
+
+    public boolean updateTitle(
+            int id,
+            String title
+    ) {
+        boolean updated = new TaskTitleQueryUpdate(title, id, dbConnection.connection()).update();
+        if (updated) {
+            List<TaskGetResponse> select = new TaskQuerySelect(id, dbConnection.connection()).select();
+            if (!select.isEmpty()) {
+                TaskGetResponse task = select.get(0);
+                try {
+                    int estimate = estimatorService.estimate(task.getTitle(), task.getDescription());
+                    updateEstimate(id, estimate);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return updated;
+    }
+
+    public boolean updateDescription(
+            int id,
+            String description
+    ) {
+        boolean updated = new TaskDescriptionQueryUpdate(description, id, dbConnection.connection()).update();
+        if (updated) {
+            List<TaskGetResponse> select = new TaskQuerySelect(id, dbConnection.connection()).select();
+            if (!select.isEmpty()) {
+                TaskGetResponse task = select.get(0);
+                try {
+                    int estimate = estimatorService.estimate(task.getTitle(), task.getDescription());
+                    updateEstimate(id, estimate);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return updated;
+    }
+
+    public boolean updateEstimate(
+            int id,
+            int estimate
+    ) {
+        return new TaskEstimateQueryUpdate(estimate, id, dbConnection.connection()).update();
     }
 }

@@ -4,34 +4,33 @@ import java.util.Objects;
 
 public class EstimatorRequest {
 
-    private String text;
-    private int complexity;
+    private String title;
+    private String description;
 
-    public EstimatorRequest() {
-    }
+    public EstimatorRequest(){}
 
     public EstimatorRequest(
-            String text,
-            int complexity
+            String title,
+            String description
     ) {
-        this.text = text;
-        this.complexity = complexity;
+        this.title = title;
+        this.description = description;
     }
 
-    public String getText() {
-        return text;
+    public String getTitle() {
+        return title;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public int getComplexity() {
-        return complexity;
+    public String getDescription() {
+        return description;
     }
 
-    public void setComplexity(int complexity) {
-        this.complexity = complexity;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -39,19 +38,19 @@ public class EstimatorRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EstimatorRequest that = (EstimatorRequest) o;
-        return complexity == that.complexity && Objects.equals(text, that.text);
+        return Objects.equals(title, that.title) && Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(text, complexity);
+        return Objects.hash(title, description);
     }
 
     @Override
     public String toString() {
         return "EstimatorRequest{" +
-                "text='" + text + '\'' +
-                ", complexity=" + complexity +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }
