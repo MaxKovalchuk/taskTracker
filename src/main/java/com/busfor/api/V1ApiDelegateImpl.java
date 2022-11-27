@@ -290,6 +290,20 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 	}
 
 	@Override
+	public ResponseEntity<Void> v1TaskIdAutoestimatePost(Integer id) {
+		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		if (id == null || id <= 0) {
+			response = new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		} else {
+			if (taskController.exists(id)) {
+				taskController.autoestimate(id);
+				response = new ResponseEntity<Void>(HttpStatus.OK);
+			}
+		}
+		return response;
+	}
+
+	@Override
 	public ResponseEntity<Void> v1TaskIdStatusPost(Integer id, Integer statusId) {
 		ResponseEntity<Void> response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		if (id == null || id <= 0 || statusId == null || statusId < 0 || statusId > Status.values().length) {

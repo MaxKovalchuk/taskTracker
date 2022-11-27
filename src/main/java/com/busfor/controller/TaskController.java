@@ -106,6 +106,19 @@ public class TaskController {
         return updated;
     }
 
+    public void autoestimate(int id) {
+        List<TaskGetResponse> select = new TaskQuerySelect(id, dbConnection.connection()).select();
+        if (!select.isEmpty()) {
+            TaskGetResponse task = select.get(0);
+            try {
+                int estimate = estimatorService.estimate(task.getTitle(), task.getDescription());
+                updateEstimate(id, estimate);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public boolean updateEstimate(
             int id,
             int estimate

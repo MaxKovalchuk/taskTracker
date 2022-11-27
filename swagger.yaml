@@ -367,6 +367,26 @@ paths:
         500:
           description: interal server error
 
+  /v1/task/{id}/autoestimate:
+    post:
+      description: auto estimate task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: OK
+        400:
+          description: task id is empty
+        404:
+          description: task with given id not found
+        500:
+          description: interal server error
+
   /v1/task/{id}/estimate:
     put:
       description: change task estimate
